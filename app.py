@@ -47,7 +47,7 @@ df_cat2_group = (df_trends.pivot_table(index="name", columns="cat2", values="ana
 
 min_count = st.sidebar.slider(
     f"Minimum number of recommendations (Count):",
-     value=0, step=1, min_value=0, max_value=df_cat2_group["Count"].max())
+     value=0, step=1, min_value=0, max_value=int(df_cat2_group["Count"].max()))
 
 df_cat2_group = df_cat2_group.loc[df_cat2_group.Count >= min_count]
 df_companies_0 = df_companies_0.loc[df_companies_0.name.isin(df_cat2_group.index)]
