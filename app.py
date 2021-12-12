@@ -1,9 +1,12 @@
+import os
 import streamlit as st
 import pandas as pd
 from st_aggrid import AgGrid, DataReturnMode, GridUpdateMode, JsCode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 import datetime
 from dateutil import relativedelta
+
+PATH_DATA = os.path.abspath("./data/example")
 
 dict_trends = {-1: "\u25E2", 0: "\u25A0", 1: "\u25E5"}
 
@@ -29,14 +32,14 @@ min_pos_share = st.sidebar.slider(
      value=0, step=1, min_value=0, max_value=100)
 
 
-df_companies_0 = pd.read_pickle("./df_companies.pickle")
-df_targets = pd.read_pickle("df_targets.pickle").join(df_companies_0.set_index("id_wkn").name, on="id_wkn")
-df_trends = pd.read_pickle("df_trends.pickle").join(df_companies_0.set_index("id_wkn").name, on="id_wkn")
+df_companies_0 = pd.read_pickle(os.path.join(PATH_DATA, "df_companies.pickle"))
+df_targets = pd.read_pickle(os.path.join(PATH_DATA, "df_targets.pickle")).join(df_companies_0.set_index("id_wkn").name, on="id_wkn")
+df_trends = pd.read_pickle(os.path.join(PATH_DATA, "df_trends.pickle")).join(df_companies_0.set_index("id_wkn").name, on="id_wkn")
 
 df_trends.cat2 = df_trends.cat2.replace(dict_trends)
 
 df_trends.date = pd.to_datetime(df_trends.date, format="%d.%m.%y")
-df_trends = df_trends.set_index("date").loc[limit_month_name:].reset_index()
+df_trends = df_trends.set_index("date").sort_index().loc[limit_month_name:].reset_index()
 
 df_cat2_group = (df_trends.pivot_table(index="name", columns="cat2", values="analyst", aggfunc=len)
                           .fillna(0)).assign(Count=lambda df: df.sum(axis=1)).astype(int)
