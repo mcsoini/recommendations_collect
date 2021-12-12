@@ -44,6 +44,13 @@ df_trends = df_trends.set_index("date").sort_index().loc[limit_month_name:].rese
 df_cat2_group = (df_trends.pivot_table(index="name", columns="cat2", values="analyst", aggfunc=len)
                           .fillna(0)).assign(Count=lambda df: df.sum(axis=1)).astype(int)
 
+min_count = st.sidebar.slider(
+    f"Minimum number of recommendations (Count):",
+     value=0, step=1, min_value=0, max_value=df_cat2_group["Count"].max())
+
+df_cat2_group = df_cat2_group.loc[df_cat2_group.Count >= min_count]
+df_companies_0 = df_companies_0.loc[df_companies_0.name.isin(df_cat2_group.index)]
+
 df_trends.date = df_trends.date.dt.date
 
 name_share_positive = f"%{dict_trends[1]}"
