@@ -12,7 +12,7 @@ dict_trends = {-1: "\u25E2", 0: "\u25A0", 1: "\u25E5"}
 
 st.set_page_config(page_title="Stock Recommendations", layout="wide", page_icon="🧊")
 
-st.sidebar.markdown("Stock markt analyst recommendations shamelessly "
+st.sidebar.markdown("Collection of stock market analyst recommendations shamelessly "
                     "ripped from a public website and "
                     "presented in a neat sortable table. Enjoy."
                     "\n\n-------------")
@@ -30,6 +30,7 @@ limit_month_name = select_date.strftime('%B %Y')
 min_pos_share = st.sidebar.slider(
     f"Minimum positive share (%{dict_trends[1]}):",
      value=0, step=1, min_value=0, max_value=100)
+
 
 
 df_companies_0 = pd.read_pickle(os.path.join(PATH_DATA, "df_companies.pickle"))
