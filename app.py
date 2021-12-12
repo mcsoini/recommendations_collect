@@ -130,7 +130,7 @@ if selected_rows:
 
 
 else:
-        "Please select a row in the table above to show all recommendation ratings"
+        "Please select a row in the table above to show analyst recommendation details."
 
 
 st.sidebar.markdown("--------------------------")
