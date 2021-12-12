@@ -1,1 +1,1 @@
-Simple streamlit app displaying scraped stock recommendations
+Simple streamlit app displaying scraped stock recommendations.
