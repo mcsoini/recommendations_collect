@@ -398,7 +398,7 @@ def parse_industry_table(args):
 
     try:
         add_df = pd.read_html(str(tb), thousands='.', decimal=',',
-                              converters={'Kurszeit': str})[0]
+                              converters={'Kurszeit': str}, flavor="bs4")[0]
 
         add_df['their_date'] = add_df.Kurszeit#pd.to_datetime(add_df.Kurszeit, format='%d%m%Y')
     except AttributeError as e:
@@ -646,7 +646,7 @@ class PriceTargetTable(DetailTable):
 
         df: pd.DataFrame
 
-        df = [df for df in pd.read_html(html) 
+        df = [df for df in pd.read_html(html, flavor="bs4") 
               if "Abstand Kursziel" in df.columns][0]
         df = df.rename(columns=lambda x: x.replace('*', ''))
 
