@@ -11,6 +11,7 @@ import aiohttp
 import itertools
 import multiprocessing
 from datetime import datetime
+from sqlalchemy import create_engine
 from typing import Any, List, Set, Tuple, Dict, Optional, Literal, Union
 import argparse
 
@@ -27,7 +28,6 @@ import numpy as np
 from utils.parallelization import parallelize_df  # type: ignore
 from utils.logger import _get_logger  # type: ignore 
 
-
 logger = _get_logger(__name__)
 
 load_dotenv()
@@ -35,7 +35,9 @@ load_dotenv()
 BASE_URL = os.getenv('BASE_URL')
 ASYNCIO_CHUNKSIZE = 500
 RETRIES_SINGLE_PAGE = 10
-
+POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD')
+POSTGRES_USERNAME = os.getenv('POSTGRES_USERNAME')
+POSTGRES_IP = os.getenv('POSTGRES_IP')
 
 class _CommandLine:
     def __init__(self):
@@ -415,7 +417,7 @@ def parse_industry_table(args):
         add_df['their_date'] = add_df.Kurszeit#pd.to_datetime(add_df.Kurszeit, format='%d%m%Y')
     except AttributeError as e:
         print(e)
-        print(f"Columns: {add_df.columns}")
+        print(f"Raw table: {tb}")
         print(f"Page: {page}")
         raise(e)
 
@@ -775,6 +777,7 @@ class TrendTable(DetailTable):
         df_missing_cat1 = df.loc[df.cat1.isna()]
         assert df_missing_cat1.empty, f"Found unknown cat1: {df_missing_cat1.cat1_0.unique()}"
 
+        df = df.loc[df.cat2 != ""]
         df.cat2 = df.cat2.replace({"arrow-right": 0,
                                    "arrow-right-top": 1, 
                                    "arrow-right-bottom": -1})
@@ -801,7 +804,13 @@ if __name__ == '__main__':
     table_targets = PriceTargetTable(df_companies).make_table()
     table_trends = TrendTable(df_companies).make_table()
 
-    df_companies.to_pickle(os.path.join(os.path.normpath("data"), "df_companies.pickle"))
-    table_trends.table.to_pickle(os.path.join(os.path.normpath("data"), "df_trends.pickle"))
-    table_targets.table.to_pickle(os.path.join(os.path.normpath("data"), "df_targets.pickle"))
+    # df_companies.to_pickle(os.path.join(os.path.normpath("data"), "df_companies.pickle"))
+    # table_trends.table.to_pickle(os.path.join(os.path.normpath("data"), "df_trends.pickle"))
+    # table_targets.table.to_pickle(os.path.join(os.path.normpath("data"), "df_targets.pickle"))
+
+    engine = create_engine(f"postgresql://{POSTGRES_USERNAME}:{POSTGRES_PASSWORD}@{POSTGRES_IP}:5432/maindb")
+
+    table_targets.table.to_sql("targets", engine, if_exists="replace")
+    table_trends.table.query("cat2 != ''").to_sql("trends", engine, if_exists="replace")
+    df_companies.to_sql("companies", engine, if_exists="replace")
 
