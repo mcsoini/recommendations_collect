@@ -63,8 +63,8 @@ min_pos_share = st.sidebar.slider(
 
 
 # df_companies_0 = pd.read_pickle(os.path.join(PATH_DATA, "df_companies.pickle"))
-# df_targets = df_targets.join(df_companies_0.set_index("id_wkn").name, on="id_wkn")
-# df_trends = df_trends.join(df_companies_0.set_index("id_wkn").name, on="id_wkn")
+df_targets = df_targets.join(df_companies_0.set_index("id_wkn").name, on="id_wkn")
+df_trends = df_trends.join(df_companies_0.set_index("id_wkn").name, on="id_wkn")
 
 df_trends.cat2 = df_trends.cat2.replace(dict_trends)
 
