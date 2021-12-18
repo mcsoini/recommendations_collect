@@ -12,6 +12,7 @@ import itertools
 import multiprocessing
 from datetime import datetime
 from typing import Any, List, Set, Tuple, Dict, Optional, Literal, Union
+import argparse
 
 import wrapt
 import tqdm # type: ignore 
@@ -34,6 +35,17 @@ load_dotenv()
 BASE_URL = os.getenv('BASE_URL')
 ASYNCIO_CHUNKSIZE = 500
 RETRIES_SINGLE_PAGE = 10
+
+
+class _CommandLine:
+    def __init__(self):
+        parser = argparse.ArgumentParser(description="")
+        parser.add_argument("-i", "--industry", help="Optional", required=False, default=None)
+        argument = parser.parse_args()
+
+        self.industry = argument.industry
+        print("Selected industry: {0}".format(argument.industry))
+
 
 
 async def asyncget_url_data(url, loop) -> Tuple[str, str]:
@@ -776,10 +788,13 @@ if __name__ == '__main__':
 
     logger.setLevel("INFO")
 
+    industry = _CommandLine().industry  # suggestion: 94
+
     dict_industries = get_industries(drop_zero=True)
-    # dict_industries = {key: val for key, val
-    #                    in list(dict_industries.items()) 
-    #                    if key == "94"}
+    if industry: 
+        dict_industries = {key: val for key, val
+                           in list(dict_industries.items()) 
+                           if key == str(industry)}
 
     df_companies = get_companies_table(dict_industries)
 
