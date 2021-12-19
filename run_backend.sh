@@ -7,4 +7,4 @@ cd "$(dirname "$0")"
 
 export PYTHONPATH=$PYTHONPATH:/home/jovyan/app/python-dotenv/src
 
-python /home/jovyan/app/backend.py -i 94 
+python /home/jovyan/app/backend.py
