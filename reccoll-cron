@@ -1,2 +1,2 @@
-47 * * * * /home/jovyan/app/run_backend.sh > /proc/1/fd/1 2>/proc/1/fd/2
+0 */2 * * * /home/jovyan/app/run_backend.sh > /proc/1/fd/1 2>/proc/1/fd/2
 
