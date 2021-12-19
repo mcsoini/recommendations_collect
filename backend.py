@@ -465,6 +465,9 @@ def get_companies_table(dict_industries: Dict[str, str]) -> pd.DataFrame:
     df_full = (df.groupby([c for c in df.columns
                            if not c in ['ind', 'ind_id', 'page']]).first()
                          ).reset_index()
+    
+    df_full["datetime"] = pd.to_datetime(df_full["datetime"])
+
     return df_full
 
 

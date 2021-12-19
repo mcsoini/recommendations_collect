@@ -9,7 +9,6 @@ from streamlit.report_thread import get_report_ctx
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 
-PATH_DATA = os.path.abspath("./data/downloaded")
 
 dict_trends = {-1: "\u25E2", 0: "\u25A0", 1: "\u25E5"}
 
@@ -42,6 +41,11 @@ df_targets = df_targets.copy()
 df_trends = df_trends.copy()
 df_companies_0 = df_companies_0.copy()
 
+data_datetime = max(df_targets.datetime.max(),
+                    df_trends.datetime.max(),
+                    df_companies_0.datetime.max())
+
+
 st.sidebar.markdown("Collection of stock market analyst recommendations shamelessly "
                     "ripped from a public website and "
                     "presented in a neat sortable table. Enjoy."
@@ -62,7 +66,6 @@ min_pos_share = st.sidebar.slider(
      value=0, step=1, min_value=0, max_value=100)
 
 
-# df_companies_0 = pd.read_pickle(os.path.join(PATH_DATA, "df_companies.pickle"))
 df_targets = df_targets.join(df_companies_0.set_index("id_wkn").name, on="id_wkn")
 df_trends = df_trends.join(df_companies_0.set_index("id_wkn").name, on="id_wkn")
 
@@ -91,6 +94,9 @@ df_targets_companies["Price targets"] = df_targets_companies.applymap(lambda x: 
 df_cat2_group = df_cat2_group.reset_index().join(df_targets_companies["Price targets"], on="name").set_index(df_cat2_group.index.names)
 
 name_share_positive = f"%{dict_trends[1]}"
+
+# complement columns
+df_cat2_group[[c for c in dict_trends.values() if not c in df_cat2_group.columns]] = 0
 
 df_cat2_group["share_positive"] = (df_cat2_group[dict_trends[1]] / df_cat2_group["Count"] * 100)
 df_cat2_group = df_cat2_group.loc[df_cat2_group.share_positive >= min_pos_share]
@@ -176,12 +182,6 @@ else:
 
 
 st.sidebar.markdown("--------------------------")
-
 st.sidebar.markdown("#### Backend log")
-
-log_text = st.sidebar.text_area("", placeholder="""It was the best of times, it was the worst of times, it was
-     the age of wisdom, it was the age of foolishness, it was
-     the epoch of belief, it was the epoch of incredulity, it
-     was the season of Light, it was the season of Darkness, it
-     was the spring of hope, it was the winter of despair, (...)""")
+st.sidebar.text(f"Date obtained at time: {data_datetime}")
      
