@@ -183,5 +183,5 @@ else:
 
 st.sidebar.markdown("--------------------------")
 st.sidebar.markdown("#### Backend log")
-st.sidebar.text(f"Date obtained at time: {data_datetime}")
+st.sidebar.text(f"Last update: {data_datetime}")
      
