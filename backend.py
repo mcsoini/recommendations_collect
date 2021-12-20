@@ -50,6 +50,12 @@ class _CommandLine:
 
 
 
+def parse_date(series):
+    """Parses dates and fills NaNs with today."""
+    return (pd.to_datetime(series, format="%d.%m.%y", errors="coerce")
+                    .fillna(pd.to_datetime(datetime.now().date())))
+
+
 async def asyncget_url_data(url, loop) -> Tuple[str, str]:
     """
     Download html data as str for given url.
@@ -459,14 +465,13 @@ def get_companies_table(dict_industries: Dict[str, str]) -> pd.DataFrame:
     df = parallelize_df(list_ind_table, parse_industry_table)
     logger.info(f"Fetching full stock table done; length={len(df)}.")
  
-    df["datetime"] = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    df["datetime"] = pd.to_datetime(datetime.utcnow())
+    df["their_datetime"] = parse_date(df.their_date)
 
     # clean duplicate occurrences due to stocks being included in multiple ind
     df_full = (df.groupby([c for c in df.columns
                            if not c in ['ind', 'ind_id', 'page']]).first()
                          ).reset_index()
-    
-    df_full["datetime"] = pd.to_datetime(df_full["datetime"])
 
     return df_full
 
@@ -561,6 +566,8 @@ class DetailTable(metaclass=abc.ABCMeta):
 
         self.table = df_full_table.join(self.df.set_index("id_wkn")[["name", "ind"]], 
                                         on="id_wkn")[self.cols_required]
+
+        self.table.date = parse_date(self.table.date)
 
         return self
 

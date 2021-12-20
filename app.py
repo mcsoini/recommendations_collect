@@ -71,8 +71,6 @@ df_trends = df_trends.join(df_companies_0.set_index("id_wkn").name, on="id_wkn")
 
 df_trends.cat2 = df_trends.cat2.replace(dict_trends)
 
-df_trends.date = pd.to_datetime(df_trends.date, format="%d.%m.%y")
-df_targets.date = pd.to_datetime(df_targets.date, format="%d.%m.%y")
 df_trends = df_trends.set_index("date").sort_index().loc[limit_month_name:].reset_index()
 df_targets = df_targets.set_index("date").sort_index().loc[limit_month_name:].reset_index()
 
